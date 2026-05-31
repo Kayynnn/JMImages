@@ -43,12 +43,12 @@ Halaman Sea Turtle menggunakan umpan data langsung dari CSV Google Sheets yang t
 
 **File Terkait:**
 
-* [2026_SeaTurtleSummary.html](https://www.google.com/search?q=./SeaTurtle/2026_SeaTurtleSummary.html)
-* [2026_SeaTurtleBarChart.html](https://www.google.com/search?q=./SeaTurtle/2026_SeaTurtleBarChart.html)
+* [2026_SeaTurtleSummary.html](./SeaTurtle/2026_SeaTurtleSummary.html)
+* [2026_SeaTurtleBarChart.html](./SeaTurtle/2026_SeaTurtleBarChart.html)
 
 ### Cara Kerja Impor Data
 
-Baik penghitung Ringkasan (Summary counters) maupun Grafik Batang (Bar Charts) menggunakan API `fetch()` JavaScript untuk mengunduh data spreadsheet melalui tautan CSV yang dipublikasikan (lihat [Baris 106](https://www.google.com/search?q=./SeaTurtle/2026_SeaTurtleSummary.html), atau [Baris 85](https://www.google.com/search?q=./SeaTurtle/2026_SeaTurtleBarChart.html)).
+Baik penghitung Ringkasan (Summary counters) maupun Grafik Batang (Bar Charts) menggunakan API `fetch()` JavaScript untuk mengunduh data spreadsheet melalui tautan CSV yang dipublikasikan (lihat [Baris 106](./SeaTurtle/2026_SeaTurtleSummary.html), atau [Baris 85](./SeaTurtle/2026_SeaTurtleBarChart.html)).
 
 * **Penghitung Ringkasan (Summary Counters):** Kode ini memecah teks CSV yang diunduh menjadi baris-baris, secara spesifik menargetkan baris ketiga (indeks `2`), dan mengekstrak nilai numerik untuk Sarang (Nests), Telur (Eggs), dan Tukik (Hatchlings) menggunakan fungsi bantuan `cleanNumber()` yang menghapus koma atau format teks lainnya. Angka-angka ini kemudian dimasukkan ke dalam atribut `data-turtle-target` untuk memicu animasi penghitungan.
 * **Grafik Batang (Bar Charts):** Skrip grafik menyertakan fungsi `parseCSVLine` yang kuat, yang membaca baris dengan aman bahkan jika angkanya mengandung koma (misal, `"1,958"`). Skrip ini secara otomatis memindai baris tajuk/header (indeks `0`) untuk mencari kata kunci "Green" dan "Hawksbill" guna menentukan kolom mana yang akan diambil datanya, memberikan sistem cadangan (failsafe) jika posisi kolom bergeser. Skrip ini melakukan perulangan (loop) pada data selama 12 bulan, mengisi array JavaScript (`greenNests`, `hawksNests`, dll.), dan memasukkannya langsung ke dalam Chart.js.
@@ -61,10 +61,10 @@ Korsel gambar menampilkan galeri 3 kotak yang berputar (looping) di desktop (dan
 
 **File Terkait:**
 
-* [2024_ActivityGalerry.html](https://www.google.com/search?q=./Archive2025/2024_ActivityGalerry.html)
-* [2025_ActivityGalerry.html](https://www.google.com/search?q=./Archive2024/2025_ActivityGalerry.html)
-* [2026_SeaTurtleGalerry.html](https://www.google.com/search?q=./SeaTurtle/2026_SeaTurtleGalerry.html)
-* [HeroesInAction.html](https://www.google.com/search?q=./WasteManagement/HeroesInAction.html)
+* [2024_ActivityGalerry.html](./Archive2025/2024_ActivityGalerry.html)
+* [2025_ActivityGalerry.html](./Archive2024/2025_ActivityGalerry.html)
+* [2026_SeaTurtleGalerry.html](./SeaTurtle/2026_SeaTurtleGalerry.html)
+* [HeroesInAction.html](./WasteManagement/HeroesInAction.html)
 
 ### Cara Menambahkan atau Mengubah Gambar
 
@@ -91,8 +91,8 @@ Berbeda dengan grafik Sea Turtle 2026 yang bersifat langsung (live), file-file a
 
 **File Terkait:**
 
-* [2024_BarChart.html](https://www.google.com/search?q=./Archive2025/2024_BarChart.html)
-* [2025_BarChart.html](https://www.google.com/search?q=Archive2024/2025_BarChart.html)
+* [2024_BarChart.html](./Archive2025/2024_BarChart.html)
+* [2025_BarChart.html](./Archive2024/2025_BarChart.html)
 
 ### Cara Mengedit Data Lama (Legacy Data)
 
@@ -102,7 +102,7 @@ Jika Anda perlu memperbaiki data historis di dalam arsip, Anda harus mengedit ar
 2. Gulir ke bawah hingga menemukan variabel `nestConfig`, `eggConfig`, dan `hatchConfig`.
 3. Temukan array `data: [...]` dan perbarui angka-angkanya secara manual. Pastikan angka-angka tersebut berurutan sesuai dengan array `monthLabels`.
 
-Contoh dari [2024_BarChart.html](https://www.google.com/search?q=./Archive2025/2024_BarChart.html):
+Contoh dari [2024_BarChart.html](./Archive2025/2024_BarChart.html):
 
 ```javascript
 const nestConfig = {
@@ -117,9 +117,5 @@ const nestConfig = {
   options: commonOptions
 };
 
-
-```
-
-```
 
 ```
