@@ -1,0 +1,132 @@
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+  .chart-card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    /* Slightly increased bottom padding (40px) to give the legend breathing room */
+    padding: 30px 20px 40px 20px; 
+    margin: 20px auto;
+    max-width: 500px;
+    font-family: 'Montserrat', sans-serif;
+    border-top: 5px solid #2ecc71; /* Green accent matching previous cards */
+    text-align: center;
+  }
+  
+  .chart-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #2c3e50;
+    margin-bottom: 20px;
+  }
+  
+  /* Keeps the canvas responsive */
+  .canvas-container {
+    position: relative;
+    /* Increased height from 350px to 400px so wrapping legends don't get cut off */
+    height: 400px; 
+    width: 100%;
+  }
+</style>
+
+<div class="chart-card" id="wasteChartContainer">
+  <div class="chart-title">Total Waste Collected (4.434 kg)</div>
+  <div class="canvas-container">
+    <canvas id="wastePieChart"></canvas>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const ctx = document.getElementById('wastePieChart').getContext('2d');
+    let chartInstance = null;
+
+    const chartConfig = {
+      type: 'pie',
+      data: {
+        labels: ['Plastic Waste', 'Drift / Ghost Nets', 'Inorganic Waste', 'Organic Waste'],
+        datasets: [{
+          data: [2277, 1754, 338, 65],
+          backgroundColor: [
+            '#3498db', /* Blue for Plastic */
+            '#2ecc71', /* Green for Nets */
+            '#f1c40f', /* Yellow for Inorganic */
+            '#e67e22'  /* Orange for Organic */
+          ],
+          borderWidth: 2,
+          borderColor: '#ffffff',
+          hoverOffset: 10 /* Makes the slice pop out slightly more on hover */
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        layout: {
+          /* Adds an invisible buffer inside the canvas so text doesn't hit the floor */
+          padding: {
+            bottom: 15 
+          }
+        },
+        animation: {
+          animateRotate: true, 
+          animateScale: false,
+          duration: 1500,      
+          easing: 'easeOutQuart'
+        },
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              font: {
+                family: "'Montserrat', sans-serif",
+                size: 12,
+                weight: '600'
+              },
+              padding: 20
+            }
+          },
+          /* This is the customized hover tooltip section */
+          tooltip: {
+            enabled: true,
+            backgroundColor: 'rgba(44, 62, 80, 0.9)', /* Dark grey/blue background */
+            titleFont: {
+              family: "'Montserrat', sans-serif",
+              size: 14
+            },
+            bodyFont: {
+              family: "'Montserrat', sans-serif",
+              size: 14,
+              weight: 'bold'
+            },
+            padding: 12,
+            cornerRadius: 8,
+            displayColors: true,
+            callbacks: {
+              label: function(context) {
+                return ' ' + context.raw.toLocaleString('id-ID') + ' kg'; /* Formats with thousands separator */
+              }
+            }
+          }
+        }
+      }
+    };
+
+    // Intersection Observer to wait for scroll
+    const observer = new IntersectionObserver(function(entries) {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          if (!chartInstance) {
+            chartInstance = new Chart(ctx, chartConfig);
+          }
+          observer.unobserve(entry.target);
+        }
+      });
+    }, {
+      threshold: 0.2
+    });
+
+    observer.observe(document.getElementById('wasteChartContainer'));
+  });
+</script>

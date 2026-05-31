@@ -1,0 +1,211 @@
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+
+<style>
+  .gallery-section {
+    width: 100%;
+    max-width: 1200px;
+    margin: 40px auto;
+    font-family: 'Montserrat', sans-serif;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    padding: 30px 20px;
+    box-sizing: border-box;
+    border-top: 5px solid #16a085;
+  }
+
+  .gallery-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #2c3e50;
+    text-align: center;
+    margin-bottom: 25px;
+  }
+
+  /* Main container that holds the track and buttons */
+  .carousel-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  /* Hides the images that are outside the viewing area */
+  .carousel-viewport {
+    overflow: hidden;
+    width: 100%;
+    border-radius: 8px;
+  }
+
+  /* The moving track */
+  .carousel-track {
+    display: flex;
+    align-items: center;
+    /* Transition is handled in JS for the infinite loop effect */
+  }
+
+  /* Individual image containers */
+  .carousel-slide {
+    flex: 0 0 33.3333%; /* Shows exactly 3 square images */
+    box-sizing: border-box;
+    padding: 0 10px;
+  }
+
+  .carousel-slide img {
+    width: 100%;
+    aspect-ratio: 1 / 1; /* Perfect square */
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+  }
+
+  .carousel-slide img:hover {
+    transform: scale(1.02); /* Slight pop effect on hover */
+  }
+
+  /* Navigation Buttons */
+  .nav-btn {
+    background-color: #ffffff;
+    color: #16a085;
+    border: 2px solid #16a085;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    z-index: 10;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: all 0.2s ease;
+  }
+
+  .nav-btn:hover {
+    background-color: #16a085;
+    color: #ffffff;
+  }
+
+  .prev-btn { left: -15px; }
+  .next-btn { right: -15px; }
+
+  /* Responsive styling for mobile */
+  @media (max-width: 768px) {
+    .carousel-slide {
+      flex: 0 0 100%; /* Shows 1 image on mobile */
+    }
+    .prev-btn { left: -5px; width: 35px; height: 35px; font-size: 1rem; }
+    .next-btn { right: -5px; width: 35px; height: 35px; font-size: 1rem; }
+  }
+</style>
+
+<div class="gallery-section">
+  <div class="gallery-title">Activity Gallery</div>
+  
+  <div class="carousel-container">
+    <button class="nav-btn prev-btn" id="prevBtn">&#10094;</button>
+
+    <div class="carousel-viewport">
+      <div class="carousel-track" id="imageTrack">
+        
+        <div class="carousel-slide"><img src="https://github.com/Kayynnn/JMImages/blob/main/2024/1.jpg?raw=true" alt="Gallery Image 1"></div>
+        <div class="carousel-slide"><img src="https://github.com/Kayynnn/JMImages/blob/main/2024/2.jpg?raw=true" alt="Gallery Image 2"></div>
+        <div class="carousel-slide"><img src="https://github.com/Kayynnn/JMImages/blob/main/2024/3.jpg?raw=true" alt="Gallery Image 3"></div>
+        <div class="carousel-slide"><img src="https://github.com/Kayynnn/JMImages/blob/main/2024/4.jpg?raw=true" alt="Gallery Image 4"></div>
+        <div class="carousel-slide"><img src="https://github.com/Kayynnn/JMImages/blob/main/2024/5.jpg?raw=true" alt="Gallery Image 5"></div>
+        <div class="carousel-slide"><img src="https://github.com/Kayynnn/JMImages/blob/main/2024/6.jpg?raw=true" alt="Gallery Image 6"></div>
+        <div class="carousel-slide"><img src="https://github.com/Kayynnn/JMImages/blob/main/2024/7.jpg?raw=true" alt="Gallery Image 7"></div>
+        <div class="carousel-slide"><img src="https://github.com/Kayynnn/JMImages/blob/main/2024/8.jpg?raw=true" alt="Gallery Image 8"></div>
+        <div class="carousel-slide"><img src="https://github.com/Kayynnn/JMImages/blob/main/2024/9.jpg?raw=true" alt="Gallery Image 9"></div>
+        <div class="carousel-slide"><img src="https://github.com/Kayynnn/JMImages/blob/main/2024/10.jpg?raw=true" alt="Gallery Image 10"></div>
+
+      </div>
+    </div>
+
+    <button class="nav-btn next-btn" id="nextBtn">&#10095;</button>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const track = document.getElementById('imageTrack');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    
+    const slideSpeed = 3500; // Time between auto-slides (3.5 seconds)
+    const animationDuration = 500; // Speed of the sliding motion (0.5s)
+    
+    let isAnimating = false;
+    let autoPlayTimer;
+
+    // Function to slide Right (Next)
+    function moveNext() {
+      if (isAnimating) return; // Prevents spam-clicking
+      isAnimating = true;
+
+      const slideWidth = track.firstElementChild.getBoundingClientRect().width;
+      
+      // Animate to the left
+      track.style.transition = `transform ${animationDuration}ms ease-in-out`;
+      track.style.transform = `translateX(-${slideWidth}px)`;
+
+      // When animation finishes, move the first image to the back and reset position
+      setTimeout(() => {
+        track.style.transition = 'none';
+        track.appendChild(track.firstElementChild);
+        track.style.transform = 'translateX(0)';
+        isAnimating = false;
+      }, animationDuration);
+    }
+
+    // Function to slide Left (Previous)
+    function movePrev() {
+      if (isAnimating) return;
+      isAnimating = true;
+
+      const slideWidth = track.firstElementChild.getBoundingClientRect().width;
+      
+      // Instantly move the last image to the front, and offset the track to the left
+      track.style.transition = 'none';
+      track.insertBefore(track.lastElementChild, track.firstElementChild);
+      track.style.transform = `translateX(-${slideWidth}px)`;
+
+      // Force browser repaint, then animate back to 0
+      setTimeout(() => {
+        track.style.transition = `transform ${animationDuration}ms ease-in-out`;
+        track.style.transform = 'translateX(0)';
+      }, 20);
+
+      // Unlock clicking when done
+      setTimeout(() => {
+        isAnimating = false;
+      }, animationDuration + 20);
+    }
+
+    // Autoplay logic
+    function startAutoPlay() {
+      autoPlayTimer = setInterval(moveNext, slideSpeed);
+    }
+
+    function resetAutoPlay() {
+      clearInterval(autoPlayTimer);
+      startAutoPlay();
+    }
+
+    // Event Listeners for buttons
+    nextBtn.addEventListener('click', () => {
+      moveNext();
+      resetAutoPlay(); // Resets timer so it doesn't double-slide
+    });
+
+    prevBtn.addEventListener('click', () => {
+      movePrev();
+      resetAutoPlay();
+    });
+
+    // Start the automatic loop on load
+    startAutoPlay();
+  });
+</script>

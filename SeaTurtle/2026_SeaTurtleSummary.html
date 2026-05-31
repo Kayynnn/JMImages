@@ -1,0 +1,203 @@
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+
+<style>
+  .turtle-stats-wrapper {
+    /* Creates a subtle, soft background to frame the data */
+    background: #f4fbf9; 
+    border-radius: 16px;
+    padding: 50px 20px;
+    margin: 30px auto;
+    max-width: 1000px;
+    box-shadow: 0 10px 30px rgba(22, 160, 133, 0.08);
+  }
+
+  .turtle-stats-container {
+    display: flex;
+    flex-direction: row; /* Forces inline layout */
+    justify-content: space-around;
+    align-items: center;
+    gap: 20px;
+    font-family: 'Montserrat', sans-serif;
+  }
+
+  /* Responsive: Stacks the columns on mobile screens */
+  @media (max-width: 768px) {
+    .turtle-stats-container {
+      flex-direction: column;
+      gap: 50px;
+    }
+  }
+
+  .turtle-stat-item {
+    text-align: center;
+    flex: 1;
+    
+    /* Animation Setup: Hidden, smaller, and pushed down */
+    opacity: 0;
+    transform: translateY(40px) scale(0.85);
+    /* The cubic-bezier creates a subtle "spring" or bounce effect */
+    transition: all 0.9s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .turtle-stat-item.is-visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  .turtle-icon {
+    font-size: 4rem; /* Large, clear icons */
+    margin-bottom: 15px;
+    /* Optional: adds a gentle floating animation to the icons */
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .turtle-number {
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: #16a085; /* Ocean green color */
+    margin-bottom: 5px;
+    line-height: 1;
+  }
+
+  .turtle-label {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #34495e;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+  }
+
+  /* Keyframes for the subtle icon floating effect */
+  @keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-8px); }
+    100% { transform: translateY(0px); }
+  }
+</style>
+
+<div class="turtle-stats-wrapper">
+  <div class="turtle-stats-container" id="turtleDataSection">
+    
+    <div class="turtle-stat-item">
+      <div class="turtle-icon" style="animation-delay: 0s;">🪺</div>
+      <div class="turtle-number" data-turtle-target="0">0</div>
+      <div class="turtle-label">Nests Secured</div>
+    </div>
+
+    <div class="turtle-stat-item">
+      <div class="turtle-icon" style="animation-delay: 1s;">🥚</div>
+      <div class="turtle-number" data-turtle-target="0">0</div>
+      <div class="turtle-label">Eggs Relocated</div>
+    </div>
+
+    <div class="turtle-stat-item">
+      <div class="turtle-icon" style="animation-delay: 2s;">🐢</div>
+      <div class="turtle-number" data-turtle-target="0">0</div>
+      <div class="turtle-label">Hatchlings Released</div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    
+    // The CSV Link from Google Sheets
+    const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSvlQfodxG5UceSXjdPtlOO-nEs_0dmYXRbaCgZStDEybEX9Q6NL98G9C1cdblF1NurJL2Ev568n2_9/pub?gid=136475812&single=true&output=csv";
+
+    // Step 1: Fetch the data first
+    fetch(csvUrl)
+      .then(response => response.text())
+      .then(csvText => {
+        
+        // Split the text block into individual rows
+        const rows = csvText.split("\n");
+
+        // Programming starts counting at 0. So Row 3 is index 2.
+        const row3 = rows[2].split(",");
+
+        // Helper function to strip any potential quotes or commas out of the spreadsheet numbers
+        const cleanNumber = (str) => parseInt(str.replace(/[^0-9]/g, ""), 10);
+
+        // Column A is 0, B is 1, C is 2, D is 3
+        const valB3 = cleanNumber(row3[1]); // Nests
+        const valC3 = cleanNumber(row3[2]); // Eggs
+        const valD3 = cleanNumber(row3[3]); // Hatchlings
+
+        // Step 2: Inject the data into the HTML elements
+        const numberDivs = document.querySelectorAll('.turtle-number');
+        if(numberDivs.length >= 3) {
+          numberDivs[0].setAttribute('data-turtle-target', valB3);
+          numberDivs[1].setAttribute('data-turtle-target', valC3);
+          numberDivs[2].setAttribute('data-turtle-target', valD3);
+        }
+
+        // Step 3: Now that data is loaded, start the animation observer
+        initTurtleAnimations();
+
+      })
+      .catch(error => console.error("Error loading CSV data:", error));
+
+
+    // Step 4: The Animation Logic (wrapped in a function so it waits for the fetch)
+    function initTurtleAnimations() {
+      const turtleItems = document.querySelectorAll('.turtle-stat-item');
+      const turtleContainer = document.getElementById('turtleDataSection');
+
+      // Independent Counter Function
+      const countUp = (element, endValue, duration) => {
+        let startTime = null;
+        const step = (currentTime) => {
+          if (!startTime) startTime = currentTime;
+          const progress = Math.min((currentTime - startTime) / duration, 1);
+          
+          // Easing function for smooth deceleration
+          const easeOut = 1 - Math.pow(1 - progress, 3);
+          const currentNum = Math.floor(easeOut * endValue);
+
+          // Format with Indonesian/European dots for thousands
+          element.innerHTML = currentNum.toLocaleString('id-ID');
+
+          if (progress < 1) {
+            window.requestAnimationFrame(step);
+          } else {
+            element.innerHTML = endValue.toLocaleString('id-ID');
+          }
+        };
+        window.requestAnimationFrame(step);
+      };
+
+      // Intersection Observer specifically for the turtle section
+      const turtleObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            
+            turtleItems.forEach((item, index) => {
+              // Stagger the bounce-in effect
+              setTimeout(() => {
+                item.classList.add('is-visible');
+
+                // Trigger the number counter
+                const numberDiv = item.querySelector('.turtle-number');
+                const targetNum = parseInt(numberDiv.getAttribute('data-turtle-target'), 10);
+                
+                if (targetNum && targetNum > 0) {
+                  countUp(numberDiv, targetNum, 2500); // 2.5 seconds duration
+                }
+              }, index * 300); // 300ms delay between left, middle, and right
+            });
+
+            turtleObserver.unobserve(entry.target);
+          }
+        });
+      }, {
+        threshold: 0.3 // Waits until 30% of the block is on screen
+      });
+
+      if (turtleContainer) {
+        turtleObserver.observe(turtleContainer);
+      }
+    }
+    
+  });
+</script>

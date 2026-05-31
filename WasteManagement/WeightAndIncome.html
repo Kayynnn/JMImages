@@ -1,0 +1,140 @@
+<!-- Import Montserrat from Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;800&display=swap" rel="stylesheet">
+
+<style>
+  .impact-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    font-family: 'Montserrat', sans-serif;
+    padding: 20px 0;
+  }
+  
+  .impact-card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    padding: 30px 20px;
+    text-align: center;
+    flex: 1;
+    min-width: 250px;
+    max-width: 320px;
+    border-top: 5px solid #2ecc71;
+    
+    /* Animation Setup: Start hidden and pushed down */
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+  }
+  
+  /* The class added by JavaScript to trigger the animation */
+  .impact-card.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .impact-icon {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+  }
+  
+  .impact-number {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #2c3e50;
+    margin-bottom: 5px;
+  }
+  
+  .impact-label {
+    font-size: 1rem;
+    font-weight: 400;
+    color: #7f8c8d;
+    line-height: 1.4;
+  }
+</style>
+
+<div class="impact-container" id="impactSection">
+  <!-- Card 1 -->
+  <div class="impact-card">
+    <div class="impact-icon">♻️</div>
+    <!-- Notice the data-target and data-suffix added here -->
+    <div class="impact-number" data-target="830" data-suffix=" kg">0 kg</div>
+    <div class="impact-label">Valuable Waste Collected</div>
+  </div>
+
+  <!-- Card 2 -->
+  <div class="impact-card">
+    <div class="impact-icon">💰</div>
+    <!-- Notice the data-target and data-prefix added here -->
+    <div class="impact-number" data-target="1310000" data-prefix="Rp ">Rp 0</div>
+    <div class="impact-label">Additional Waste Bank Income</div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const cards = document.querySelectorAll('.impact-card');
+    const container = document.getElementById('impactSection');
+
+    // 1. The Number Counter Logic
+    const animateValue = (element, start, end, duration, prefix = "", suffix = "") => {
+      let startTimestamp = null;
+      const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        
+        // Easing function so it slows down as it reaches the target number
+        const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+        const current = Math.floor(easeOutQuart * (end - start) + start);
+
+        // Format the number with commas (English locale)
+        element.innerHTML = prefix + current.toLocaleString('en-US') + suffix;
+
+        if (progress < 1) {
+          window.requestAnimationFrame(step);
+        } else {
+          // Ensure it ends on the exact target number
+          element.innerHTML = prefix + end.toLocaleString('en-US') + suffix;
+        }
+      };
+      window.requestAnimationFrame(step);
+    };
+
+    // 2. The Scroll Observer (Intersection Observer)
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          
+          // Loop through each card to apply a staggered delay
+          cards.forEach((card, index) => {
+            setTimeout(() => {
+              // Trigger the slide-up fade
+              card.classList.add('is-visible');
+
+              // Trigger the number count
+              const numberElement = card.querySelector('.impact-number');
+              const target = parseInt(numberElement.getAttribute('data-target'), 10);
+              const prefix = numberElement.getAttribute('data-prefix') || "";
+              const suffix = numberElement.getAttribute('data-suffix') || "";
+
+              if (target) {
+                animateValue(numberElement, 0, target, 2000, prefix, suffix); // 2000ms (2 seconds) duration
+              }
+              
+            }, index * 250); // 250ms delay between each card appearing
+          });
+
+          // Stop watching once the animation has played
+          observer.unobserve(entry.target);
+        }
+      });
+    }, {
+      threshold: 0.2 // Triggers when 20% of the container is on screen
+    });
+
+    if (container) {
+      observer.observe(container);
+    }
+  });
+</script>
